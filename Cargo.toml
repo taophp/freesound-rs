@@ -2,6 +2,12 @@
 name = "freesound-rs"
 version = "0.1.0"
 edition = "2024"
+authors = ["Stéphane Mourey<mail@stephanemourey.fr>"]
+homepage = "https://github.com/taophp/freesound-rs"
+repository = "https://github.com/taophp/freesound-rs"
+license = "GNU LGPL"
+keywords = ["audio", "sound", "api", "freesound", "client"]
+categories = ["api-bindings", "multimedia::audio"]
 
 [dependencies]
 dotenvy = "0.15.7"
