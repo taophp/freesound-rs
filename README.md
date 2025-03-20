@@ -1,14 +1,15 @@
 # freesound-rs
 
+** WORK IN PROGRESS ! DO NOT USE IN PRODUCTION ! **
+
 A Rust client library for the [Freesound API](https://freesound.org/docs/api/).
 
 ## Installation
 
 Add this to your `Cargo.toml`:
 
-```toml
-[dependencies]
-freesound-rs = "0.1.0"
+```bash
+cargo add freesound-rs
 ```
 
 ## Usage
@@ -22,6 +23,20 @@ fn main() {
 
     // Use the client to interact with the Freesound API
 }
+```
+
+## Running tests
+
+Obtain a Freesound API key:
+1. Register for an account at https://freesound.org/
+2. Visit https://freesound.org/apiv2/apply/ to create an API application
+3. After approval, you'll receive your API key
+
+Create an `.env` file with your keya and run the tests:
+```bash
+cp env.sample .env
+# edit `.env` to add you FreeSound API key
+cargo test
 ```
 
 ## License

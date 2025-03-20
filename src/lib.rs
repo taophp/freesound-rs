@@ -101,4 +101,102 @@ impl FreesoundClient {
     pub fn base_url(&self) -> &str {
         &self.base_url
     }
+
+    /// Creates a new authenticated request to the Freesound API
+    ///
+    /// This method adds the API key as a query parameter to requests
+    ///
+    /// # Arguments
+    ///
+    /// * `method` - HTTP method to use
+    /// * `path` - API endpoint path (without the base URL)
+    ///
+    /// # Returns
+    ///
+    /// A reqwest RequestBuilder with the API key included
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use std::env;
+    /// # use freesound_rs::FreesoundClient;
+    /// # use reqwest::Method;
+    /// # dotenvy::dotenv().ok();
+    /// # let api_key = env::var("FREESOUND_API_KEY").expect("FREESOUND_API_KEY must be set");
+    /// # let client = FreesoundClient::new(api_key, None);
+    /// let request = client.request(Method::GET, "sounds/1234");
+    /// ```
+    pub fn request(&self, method: reqwest::Method, path: &str) -> reqwest::RequestBuilder {
+        let url = format!("{}/{}", self.base_url, path.trim_start_matches('/'));
+        self.client
+            .request(method, url)
+            .query(&[("token", &self.api_key)])
+    }
+
+    /// Performs a test request to verify the API key is valid
+    ///
+    /// # Returns
+    ///
+    /// A Result indicating whether the API key is valid
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use std::env;
+    /// # use freesound_rs::{FreesoundClient, FreesoundError};
+    /// #
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), FreesoundError> {
+    /// dotenvy::dotenv().ok();
+    /// let api_key = env::var("FREESOUND_API_KEY").expect("FREESOUND_API_KEY must be set");
+    /// let client = FreesoundClient::new(api_key, None);
+    ///
+    /// // Test avec une clé valide
+    /// client.test_api_key().await?;
+    /// println!("API key is valid!");
+    ///
+    /// // Test avec une clé invalide
+    /// let invalid_client = FreesoundClient::new("invalid_key".to_string(), None);
+    /// let result = invalid_client.test_api_key().await;
+    /// assert!(result.is_err());
+    /// println!("Invalid API key correctly detected!");
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn test_api_key(&self) -> Result<()> {
+        let response = self
+            .request(reqwest::Method::GET, "sounds/794253")
+            .send()
+            .await
+            .map_err(FreesoundError::from)?;
+
+        let status = response.status();
+
+        // Si le statut est explicitement Unauthorized, on peut directement retourner une erreur
+        if status == reqwest::StatusCode::UNAUTHORIZED {
+            return Err(FreesoundError::AuthError("Invalid API key".to_string()));
+        }
+
+        // Pour d'autres codes d'erreur, on examine le contenu
+        if !status.is_success() {
+            let body = response.text().await.map_err(FreesoundError::from)?;
+            return Err(FreesoundError::ApiError(format!("API request failed: {status} - {body}")));
+        }
+
+        // Si on arrive ici, la requête a réussi - on vérifie le JSON
+        let body = response.text().await.map_err(FreesoundError::from)?;
+
+        match serde_json::from_str::<serde_json::Value>(&body) {
+            Ok(json) => {
+                if json.get("id").is_some() {
+                    Ok(())
+                } else {
+                    Err(FreesoundError::ApiError(format!("Response missing sound ID: {body}")))
+                }
+            },
+            Err(e) => {
+                Err(FreesoundError::ApiError(format!("Invalid JSON response: {e} - {body}")))
+            }
+        }
+    }
 }
