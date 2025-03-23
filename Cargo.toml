@@ -1,9 +1,9 @@
 [package]
 name = "freesound-rs"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 authors = ["Stéphane Mourey<mail@stephanemourey.fr>"]
-description = "A Rust client for the Freesound API"
+description = "A Rust client for the Freesound API to search and get sounds only"
 homepage = "https://github.com/taophp/freesound-rs"
 repository = "https://github.com/taophp/freesound-rs"
 license = "GNU LGPL"
