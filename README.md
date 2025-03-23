@@ -1,7 +1,5 @@
 # freesound-rs
 
-** WORK IN PROGRESS ! DO NOT USE IN PRODUCTION ! **
-
 A Rust client library for the [Freesound API](https://freesound.org/docs/api/).
 
 Note: this is a side project, so I should only implement search and get sound endpoints for now. But contributions are welcome!

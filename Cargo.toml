@@ -6,7 +6,7 @@ authors = ["Stéphane Mourey<mail@stephanemourey.fr>"]
 description = "A Rust client for the Freesound API to search and get sounds only"
 homepage = "https://github.com/taophp/freesound-rs"
 repository = "https://github.com/taophp/freesound-rs"
-license = "GNU LGPL"
+license = "LGPL-3.0-or-later"
 keywords = ["audio", "sound", "api", "freesound", "client"]
 categories = ["api-bindings", "multimedia::audio"]
 
